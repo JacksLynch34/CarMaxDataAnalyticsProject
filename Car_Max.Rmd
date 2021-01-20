@@ -15,34 +15,13 @@ When you click the **Knit** button a document will be generated that includes bo
 
 library(readr)
 Car_Data <- read_csv("~/OneDrive - Loyola University Maryland/CaseCompetitionData2021.csv")
+attach(Car_Data)
 
-mean(Car_Data$purchase_vehicle_year)
-median(Car_Data$purchase_vehicle_year)
-summary(Car_Data$purchase_vehicle_year)
 
-summary(Car_Data$customer_income)
-summary(as.numeric(Car_Data$customer_income))
-table(Car_Data$customer_age)
-plot(Car_Data$purchase_vehicle_year)
-barplot(table(Car_Data$purchase_vehicle_year),
-        col = "dodgerblue3",
-        main = "Purchase Vehicle Year",
-        xlab = "Year",
-        ylab = "People"
-)
+
 
 _____________________________________________________________________________________
 
-
-aggregate(formula = vehicle_financing ~ purchase_vehicle_year,
-          data = Car_Data,
-          FUN = mean())
-
-
-
-aggregate(formula = purchase_vehicle_year ~  vehicle_financing,
-          data = Car_Data,
-          FUN = mean)
 __________________________________________________________________________________________
 install.packages('summarytools')
 install.packages("tidyverse")
@@ -52,23 +31,10 @@ library(summarytools)
 library(funModeling) 
 library(tidyverse) 
 library(Hmisc)
-
-#This does things...
-basic_eda <- function(Car_Data$purchase_model)
-{
-  glimpse(Car_Data$purchase_model)
-  df_status(Car_Data$purchase_model)
-  freq(Car_Data$purchase_model) 
-  profiling_num(Car_Data$purchase_model)
-  plot_num(Car_Data$purchase_model)
-  describe(Car_Data$purchase_model)
-}
+install.packages("dplyr")
+library(dplyr)
 
 
-
-
-table(Car_Data$purchase_model)
-summarytools::freq(Car_Data$purchase_model, order = "freq")
 
 #freq(Car_Data$purchase_model)
 #Should probably add titles, and stuff eventually
@@ -79,224 +45,102 @@ freq(Car_Data$purchase_vehicle_year)
 # Produces graph on the cars' makers
 freq(Car_Data$purchase_make)
 
-# Frequency of purchase price
-freq(Car_Data$purchase_price)
-
-# Frequency of age
-freq(Car_Data$customer_age)
-
-#Frequency of distance to dealer
-freq(Car_Data$customer_distance_to_dealer)
-
-#Did they use vehicle warranty
-freq(Car_Data$vehicle_warranty_used)
-
-#Did they previously buy from CarMax?
-freq(Car_Data$customer_previous_purchase)
 
 
-#Did they make subsequent purchases
-freq(Car_Data$subsequent_purchases)
 
-# Freq of survey
-freq(Car_Data$post_purchase_satisfaction)
 
-#Freq of gender
+
+___________________________________________________________________________________________
+summary(Car_Data)
+str(Car_Data)
+library(ggplot2)
+
+
+Car_Data$customer_age <-as.factor(Car_Data$customer_age)
+Car_Data$customer_age
+as.numeric(as.character(factor))
+
+
+lm_sub = lm(subsequent_purchases~customer_age, data = Car_Data) 
+summary(lm_sub)
+
+lm_price = lm(subsequent_purchases~ purchase_price, data = Car_Data) 
+summary(lm_price)
+
+
+lm_year = lm(purchase_vehicle_year~ purchase_price, data = Car_Data) 
+summary(lm_year)
+
+lm_TP = lm(trade_in ~ subsequent_purchases , data = Car_Data) 
+summary(lm_TP)
+
+lm_GP = lm(customer_gender ~ subsequent_purchases , data = Car_Data) 
+summary(lm_GP)
+
+
+lm_WSP = lm(vehicle_warranty_used ~ subsequent_purchases , data = Car_Data) 
+summary(lm_WSP)
+
+
+lm_SWT = lm(subsequent_purchases ~vehicle_warranty_used + trade_in , data = Car_Data) 
+summary(lm_SWT)
+plot(lm_SWT)
+
+
+
+
+Car_Data$customer_age + geom_density()
+ggplot(Car_Data$customer_age)               
+
+Gensub <- filter(Car_Data, subsequent_purchases >=1)
 freq(Car_Data$customer_gender)
-_______________________________________________________________________________________________
 
-# want to compare to see if males or females make subsequent purchases
-library(summarytools)
-library(funModeling) 
-library(tidyverse) 
-library(Hmisc)
+GensubM <- filter(Car_Data, subsequent_purchases >=1, customer_gender == "M", customer_age == "31-40", customer_income =="41000 - 60000")
+freq(Car_Data$customer_age)
+freq(Car_Data$purchase_make)
 
 
-#This filters it by women
-Women2<- filter(Car_Data, customer_gender == "F")
-
-# Code looking at the frequencies for Women
-freq(Women2$purchase_model)
-freq(Women2$customer_previous_purchase)
-freq(Women2$subsequent_purchases)
 
 
-#This filters it by Men
-Men2<- filter(Car_Data, customer_gender == "M")
+# look at people who bought caers
+subs<- filter(Car_Data, subsequent_purchases >= 1)
+lm_subs = lm(subs ~ purchase_price, data = Car_Data) 
+summary(lm_subs)
+view(Car_Data)
 
-# Code looking at the frequencies for Men
-freq(Men2$purchase_model)
-freq(Men2$customer_previous_purchase)
-freq(Men2$subsequent_purchases)
 
-# Purchase Price for males and females
-freq(Men2$purchase_price) 
-freq(Women2$purchase_price)
-
-# Purchase year for males and females
-freq(Men2$purchase_vehicle_year)
-freq(Women2$purchase_vehicle_year) 
-
-# This looks at data for people who bought F150s
 F150own <- filter(Car_Data, purchase_model == "F150")
 freq(F150own$customer_gender)
 freq(F150own$subsequent_purchases)
 freq(F150own$customer_age)
-
-#something is wrong with income
-
-freq(F150own$purchase_price)
+freq(F150own$trade_in)
 freq(F150own$purchase_vehicle_year)
-_____________________________________________________________________________________________
-
-#Next test will look at subsequent purchases
-
-Madesub <- filter(Car_Data, subsequent_purchases > 1)
-freq(Madesub$purchase_model)
-freq(Madesub$purchase_make)
-freq(Madesub$customer_age)
-freq(Madesub$customer_gender)
-freq(Madesub$purchase_vehicle_year)
-freq(Madesub$customer_income)
-
-
-# Break down into another category
-Men_sub<- filter(Car_Data, customer_gender == "M",subsequent_purchases > 1 , customer_age == "41 - 50")
-freq(Men_sub$purchase_model)
-freq(Men_sub$purchase_make)
-
-library(summarytools)
-library(funModeling) 
-library(tidyverse) 
-library(Hmisc)
-
-# This will focus on men who made subequent purchases
-Men_subNage<- filter(Car_Data, customer_gender == "M",subsequent_purchases > 1)
-freq(Men_subNage$purchase_make)
+freq(F150own$purchase_price)
+freq(F150own$customer_income)
+freq(F150own$vehicle_warranty_used)
 
 
 
-# Filters out cars besides Ford
-Men_sub2F<- filter(Car_Data, customer_gender == "M",subsequent_purchases > 1 ,customer_age == "41 - 50",purchase_make == "FORD")
-
-freq(Men_sub2F$customer_income)
-
-# Compare this to females
-
-# Break down into another category
-Wom_subp<- filter(Car_Data, customer_gender == "F",subsequent_purchases > 1)
-
-freq(Wom_subp$purchase_model)
-
-freq(Wom_subp$purchase_make)
-
-freq(Wom_subp$customer_age)
+Nissanown <- filter(Car_Data, purchase_model == "ALTIMA")
+freq(F150own$customer_gender)
+freq(Nissanown$subsequent_purchases)
+freq(F150own$customer_age)
+freq(Nissanown$trade_in)
+freq(Nissanown$purchase_vehicle_year)
+freq(Nissanown$purchase_price)
+freq(Nissanown$vehicle_warranty_used)
 
 
-# This will focus on Women who made subequent purchases
-wom_subNage<- filter(Car_Data, customer_gender == "F",subsequent_purchases > 1, customer_age == "41 - 50")
-freq(wom_subNage$purchase_make)
-freq(wom_subNage$customer_income)
+Camrynown <- filter(Car_Data, purchase_model == "CAMRY")
+freq(F150own$customer_gender)
+freq(Camrynown$subsequent_purchases)
+freq(F150own$customer_age)
+freq(Camrynown$trade_in)
+freq(Nissanown$purchase_vehicle_year)
+freq($purchase_price)
+freq(Camrynown$vehicle_warranty_used)
 
 
-
-# Filters out cars besides Ford
-Wom_sub2F<- filter(Car_Data, customer_gender == "F",subsequent_purchases > 1 ,customer_age == "41 - 50",purchase_make == "FORD")
-
-freq(Men_sub2F$customer_income)
-
-# Want to look at income related to car purcahse price
-Men_OAP<- filter(Car_Data,customer_gender == "M",
-                 customer_income == "60001 - 80000",
-                 subsequent_purchases > 1)
-freq(Men_OAP$purchase_make)            
-
-# look at who buys Ford cars
-Ford_buy<- filter(Car_Data,purchase_make == "FORD")
-freq(Ford_buy$customer_income)            
-freq(Ford_buy$subsequent_purchases)
-
-# looks at whoy buys Nissan cars
-Nissan_buy<- filter(Car_Data,purchase_make == "NISSAN")
-freq(Nissan_buy$customer_income)            
-freq(Nissan_buy$subsequent_purchases)
-
-
-# looks at who buys Chevys
-Chevy_buy<- filter(Car_Data,purchase_make == "CHEVROLET")
-freq(Chevy_buy$customer_income)            
-freq(Chevy_buy$subsequent_purchases)
-
-# looks at who buys Chevys
-Chevy_buy<- filter(Car_Data,purchase_make == "Chevy")
-freq(Chevy_buy$customer_income)            
-freq(Chevy_buy$subsequent_purchases)
-
-
-# looks at who buys Toyota
-Toyota_buy<- filter(Car_Data,purchase_make == "TOYOTA")
-freq(Toyota_buy$customer_income)    
-freq(Toyota_buy$subsequent_purchases)
-freq(Toyota_buy$trade_in)
-
-# looks at who buys Honda
-Honda_buy<- filter(Car_Data,purchase_make == "HONDA")
-freq(Honda_buy$customer_income)    
-freq(Honda_buy$subsequent_purchases)
-
-# looks at who buys Jeeps
-Jeep_buy<- filter(Car_Data,purchase_make == "JEEP")
-freq(Jeep_buy$customer_income)            
-freq(Jeep_buy$subsequent_purchases)
-freq(Jeep_buy$trade_in)
-
-
-# looks at who buys Hyundai
-Hyundai_buy<- filter(Car_Data,purchase_make == "HYUNDAI")
-freq(Hyundai_buy$customer_income)            
-freq(Hyundai_buy$subsequent_purchases)
-
-# looks at who buys Dodge
-Dodge_buy<- filter(Car_Data,purchase_make == "DODGE")
-freq(Dodge_buy$customer_income)            
-freq(Dodge_buy$subsequent_purchases)
-
-
-# looks at who buys a BMW
-BMW_buy<- filter(Car_Data,purchase_make == "BMW")
-freq(BMW_buy$customer_income)            
-freq(BMW_buy$subsequent_purchases)
-freq(BMW_buy$trade_in)
-
-# looks at who buys VW
-VW_buy<- filter(Car_Data,purchase_make == "VOLKSWAGEN")
-freq(VW_buy$customer_income)            
-freq(VW_buy$subsequent_purchases)
-freq(VW_buy$trade_in)
-
-
-# looks at who buys Mercedes
-# Mercedes has highest % of subsequent purchases
-# This looks at the exact customer
-Mercedes_buy<- filter(Car_Data,purchase_make == "MERCEDES-BENZ")
-freq(Mercedes_buy$customer_income)            
-freq(Mercedes_buy$subsequent_purchases)
-freq(Mercedes_buy$customer_age)
-freq(Mercedes_buy$purchase_model)
-freq(Mercedes_buy$purchase_vehicle_year)
-freq(Mercedes_buy$customer_income)
-freq(Mercedes_buy$purchase_price)
-freq(Mercedes_buy$trade_in)
-# looks at who buys Mazda
-Mazda_buy<- filter(Car_Data,purchase_make == "MAZDA")
-freq(Mazda_buy$customer_income)            
-freq(Mazda_buy$subsequent_purchases)
-
-
-# looks at who buys Chrysler
-Chrysler_buy<- filter(Car_Data,purchase_make == "CHRYSLER")
-freq(Chrysler_buy$customer_income)            
-freq(Chrysler_buy$subsequent_purchases)
 
 
 
